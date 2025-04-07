@@ -40,6 +40,7 @@ app.get("/", (req, res) => {
 
 // Request to metrics may add an extra temporary tcp opened connection while request is done.
 app.get("/metrics", async (req, res) => {
+  console.log("Received metrics request");
   try {
     res.set("Content-Type", register.contentType);
     res.end(await register.metrics());

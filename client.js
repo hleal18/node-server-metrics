@@ -1,7 +1,8 @@
 // websocket-client.js
 const WebSocket = require("ws");
 
-const ws = new WebSocket("ws://localhost:8080");
+// const ws = new WebSocket("ws://localhost:8080");
+const ws = new WebSocket("wss://p01--node-server-metrics--default-project--hlea-a665.salvo.code.run")
 
 ws.on("open", () => {
   console.log("Connected to server");
