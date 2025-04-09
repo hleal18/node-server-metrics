@@ -4,7 +4,7 @@ const WebSocket = require("ws");
 const client = require("prom-client");
 
 // --- Prometheus Metrics ---
-const register = new client.Registry();
+const registry = new client.Registry();
 // client.collectDefaultMetrics({ register });
 
 const openConnectionsGauge = new client.Gauge({
@@ -12,7 +12,13 @@ const openConnectionsGauge = new client.Gauge({
   help: "Current number of open TCP connections",
 });
 
-register.registerMetric(openConnectionsGauge);
+const httpRequestsTotalCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Number of total http requests",
+});
+
+registry.registerMetric(openConnectionsGauge);
+registry.registerMetric(httpRequestsTotalCounter);
 
 // --- HTTP and WebSocket Setup ---
 const app = express();
@@ -33,6 +39,12 @@ server.on("connection", (socket) => {
   });
 });
 
+app.use((req, res, next) => {
+  console.log("Request: ", req.path);
+  httpRequestsTotalCounter.inc();
+  next();
+})
+
 // --- HTTP Routes ---
 app.get("/", (req, res) => {
   res.send("Hello from HTTP!");
@@ -40,10 +52,9 @@ app.get("/", (req, res) => {
 
 // Request to metrics may add an extra temporary tcp opened connection while request is done.
 app.get("/metrics", async (req, res) => {
-  console.log("Received metrics request");
   try {
-    res.set("Content-Type", register.contentType);
-    res.end(await register.metrics());
+    res.set("Content-Type", registry.contentType);
+    res.end(await registry.metrics());
   } catch (ex) {
     res.status(500).end(ex);
   }
