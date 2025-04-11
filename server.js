@@ -40,6 +40,15 @@ server.on("connection", (socket) => {
 });
 
 app.use((req, res, next) => {
+  if (process.env?.LATENCY) {
+    setTimeout(next, Number(process.env.LATENCY));
+  } else {
+    next();
+  }
+});
+
+
+app.use((req, res, next) => {
   console.log("Request: ", req.path);
   httpRequestsTotalCounter.inc();
   next();
