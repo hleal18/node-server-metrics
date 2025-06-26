@@ -59,6 +59,18 @@ app.get("/", (req, res) => {
   res.send("Hello from HTTP!");
 });
 
+app.get("/public", (req, res) => {
+  res.send("Public!");
+});
+
+app.get("/private", (req, res) => {
+  res.send("Private!");
+});
+
+app.get("/protected", (req, res) => {
+  res.send("Protected!");
+});
+
 // Request to metrics may add an extra temporary tcp opened connection while request is done.
 app.get("/metrics", async (req, res) => {
   try {
